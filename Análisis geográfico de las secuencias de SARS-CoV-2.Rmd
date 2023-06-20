@@ -1,0 +1,518 @@
+---
+title: "Análisis geográfico de las secuencias de SARS-CoV-2: una comparación global de la diversidad genética del virus"
+author: "Hector Gutierrez y Camila Rodriguez"
+date: "5 de Mayo del 2023"
+output: html_document
+---
+
+```{r, echo=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+```
+**Análisis de biología Computacional | Profesor: Heriberto García Coronado**
+
+
+
+# Evidencia 1 | Análisis inicial
+
+```{r}
+#Descargamos los paquetes que contienen las funciones y herramientas necesarias 
+#para trabajar con los datos biológicos
+
+library(viridisLite)
+library(ape)
+library(ade4)
+library(seqinr)
+library(adegenet)
+library(Biostrings)
+library(DECIPHER)
+library(ggtree)
+library(ggplot2)
+library(tidyr)
+
+#Utilizamos el getwd() para usar el directorio de trabajo actual
+#y el setwd() le da a R una dirección a un directorio diferente 
+#para que ahi mismo se almacene y guarde la lectura y escritura de archivos.
+
+getwd()
+setwd("C:/Users/alang/Documents/Tec/Tareas/Analisis de Biologia Computacional")
+```
+
+```{r}
+
+#EJERCICIO 1 
+#Obtener los 10 genomas de diferentes países 
+
+corona_virus <- c("NC_045512", "OP435368", "OQ918256", "BS007312", "OQ913932", "OP848485", "ON291271", "MT994849",
+                  "OK096766", "MW466791")        
+
+
+# Leer archivo GenBank
+virus_sequences <- read.GenBank(corona_virus)
+write.dna(virus_sequences,file = "virus_coronavirus",format = "fasta")
+```
+
+```{r}
+#EJERCICIO 2
+#Longitud de las secuencias de cada variante 
+
+enumerar <- c(1:10)
+
+longitud <- sapply(virus_sequences, length)
+gen_long <- data.frame(Numero_Genoma = enumerar, Secuencia_ID = corona_virus, Longitud = longitud)
+
+print(gen_long,row.names = FALSE)
+
+```
+
+```{r fig.height=5, fig.width=9}
+#EJERCICIO 3
+#Gráfico de longitudes 
+
+grafica_longitud <- ggplot(gen_long, aes(x = Secuencia_ID, y = Longitud, fill = Secuencia_ID)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Virus", y = "Longitud", title = "Longitud de Sars-Cov-2 de diferentes países") +
+  theme(axis.text.x = element_text(size = 8),
+        axis.text.y = element_text(size = 8),
+        axis.title.x = element_text(face = "bold"),
+        axis.title.y = element_text(face = "bold"),
+        plot.title = element_text(face = "bold", size = 13))
+
+grafica_longitud
+```
+
+**Se puede observar que los virus mostrados en la gráfica tienen un cambio muy leve en el tamaño de las secuencias. Esto  significa que evidentemente dependiendo de la zona geográfica que se encuentre el virus puede variar su longitud en un porcentaje bastante pequeño. Al observar que el virus casi se mantiene igual en las diferentes zonas geográficas y tiempo transcurrido, indica que se ha mantenido muy parecido a como era desde un principio, teniendo una evolución lenta.**
+
+**Además los virus que se están analizando tienen entre 1 a 2 años de diferencia, por lo que es otra variable que tiene un impacto en este “leve” cambio. Estos hallazgos podrían tener implicaciones en el desarrollo de tratamientos y vacunas contra el virus, así como en la comprensión de la evolución y la propagación del virus en todo el mundo.**
+
+
+```{r}
+#EJERCICIO 5
+#Comosición de nucleotidos de cada genoma 
+
+virus_sequences_character <- c(as.character(virus_sequences))
+nucleotidos_gen <- sapply(virus_sequences_character,count,1)
+
+nucleotidos_gen 
+
+```
+
+```{r}
+#EJERCICIO 6 
+#Gráfica nucleótidos de cada genoma 
+
+nucleotidos <- as.data.frame(nucleotidos_gen)
+
+nucleotidos
+
+```
+
+
+```{r}
+#-------NC_045512------------------------------------------
+
+# Definir colores
+colores <- c("skyblue", "steelblue", "navy", "darkgreen")
+
+# Crear gráfico de barras
+grafica_nucleotidos <- ggplot(nucleotidos, aes(x = rownames(nucleotidos), y = NC_045512, fill = rownames(nucleotidos))) +
+  geom_bar(stat = "identity") +
+  labs(x = "Base nitrogenada", y = "Cantidad", title = "Composición de nucleótidos del genoma NC_045512") +
+  scale_x_discrete(labels = c("A", "C", "G", "T")) +
+  scale_fill_manual(values = colores) +
+  theme(axis.text.x = element_text(face = "bold"),
+        axis.text.y = element_text(face = "bold"),
+        axis.title.x = element_text(face = "bold"),
+        axis.title.y = element_text(face = "bold"),
+        plot.title = element_text(face = "bold", size = 13))
+
+
+# Imprimir gráfico
+print(grafica_nucleotidos)
+```
+
+```{r}
+#------OP435368---------------------------------------------------------------
+
+# Definir colores
+colores <- c("skyblue", "steelblue", "navy", "darkgreen")
+
+# Crear gráfico de barras
+grafica_nucleotidos2 <- ggplot(nucleotidos, aes(x = rownames(nucleotidos), y = OP435368, fill = rownames(nucleotidos))) +
+  geom_bar(stat = "identity") +
+  labs(x = "Base nitrogenada", y = "Cantidad", title = "Composición de nucleótidos del genoma OP435368") +
+  scale_x_discrete(labels = c("A", "C", "G", "T")) +
+  scale_fill_manual(values = colores) +
+  theme(axis.text.x = element_text(face = "bold"),
+        axis.text.y = element_text(face = "bold"),
+        axis.title.x = element_text(face = "bold"),
+        axis.title.y = element_text(face = "bold"),
+        plot.title = element_text(face = "bold", size = 13))
+
+# Imprimir gráfico
+print(grafica_nucleotidos2)
+```
+
+```{r}
+#--------OQ918256-------------------------------------------------------------
+
+colores <- c("skyblue", "steelblue", "navy", "darkgreen")
+
+# Crear gráfico de barras
+grafica_nucleotidos3 <- ggplot(nucleotidos, aes(x = rownames(nucleotidos), y = OQ918256, fill = rownames(nucleotidos))) +
+  geom_bar(stat = "identity") +
+  labs(x = "Base nitrogenada", y = "Cantidad", title = "Composición de nucleótidos del genoma OQ918256") +
+  scale_x_discrete(labels = c("A", "C", "G", "T")) +
+  scale_fill_manual(values = colores) +
+  theme(axis.text.x = element_text(face = "bold"),
+        axis.text.y = element_text(face = "bold"),
+        axis.title.x = element_text(face = "bold"),
+        axis.title.y = element_text(face = "bold"),
+        plot.title = element_text(face = "bold", size = 13))
+
+# Imprimir gráfico
+print(grafica_nucleotidos3)
+```
+
+```{r}
+#----------BS007312-----------------------------------------------------------
+
+colores <- c("skyblue", "steelblue", "navy", "darkgreen")
+
+# Crear gráfico de barras
+grafica_nucleotidos4 <- ggplot(nucleotidos, aes(x = rownames(nucleotidos), y = BS007312, fill = rownames(nucleotidos))) +
+  geom_bar(stat = "identity") +
+  labs(x = "Base nitrogenada", y = "Cantidad", title = "Composición de nucleótidos del genoma BS007312") +
+  scale_x_discrete(labels = c("A", "C", "G", "T")) +
+  scale_fill_manual(values = colores) +
+  theme(axis.text.x = element_text(face = "bold"),
+        axis.text.y = element_text(face = "bold"),
+        axis.title.x = element_text(face = "bold"),
+        axis.title.y = element_text(face = "bold"),
+        plot.title = element_text(face = "bold", size = 13))
+
+# Imprimir gráfico
+print(grafica_nucleotidos4)
+```
+
+```{r}
+#---------OQ913932-----------------------------------
+
+colores <- c("skyblue", "steelblue", "navy", "darkgreen")
+
+# Crear gráfico de barras
+grafica_nucleotidos5 <- ggplot(nucleotidos, aes(x = rownames(nucleotidos), y = OQ913932, fill = rownames(nucleotidos))) +
+  geom_bar(stat = "identity") +
+  labs(x = "Base nitrogenada", y = "Cantidad", title = "Composición de nucleótidos del genoma OQ913932") +
+  scale_x_discrete(labels = c("A", "C", "G", "T")) +
+  scale_fill_manual(values = colores) +
+  theme(axis.text.x = element_text(face = "bold"),
+        axis.text.y = element_text(face = "bold"),
+        axis.title.x = element_text(face = "bold"),
+        axis.title.y = element_text(face = "bold"),
+        plot.title = element_text(face = "bold", size = 13))
+
+# Imprimir gráfico
+print(grafica_nucleotidos5)
+```
+
+```{r}
+#---------OP848485----------------------------------
+colores <- c("skyblue", "steelblue", "navy", "darkgreen")
+
+# Crear gráfico de barras
+grafica_nucleotidos6 <- ggplot(nucleotidos, aes(x = rownames(nucleotidos), y = OP848485, fill = rownames(nucleotidos))) +
+  geom_bar(stat = "identity") +
+  labs(x = "Base nitrogenada", y = "Cantidad", title = "Composición de nucleótidos del genoma OP848485") +
+  scale_x_discrete(labels = c("A", "C", "G", "T")) +
+  scale_fill_manual(values = colores) +
+  theme(axis.text.x = element_text(face = "bold"),
+        axis.text.y = element_text(face = "bold"),
+        axis.title.x = element_text(face = "bold"),
+        axis.title.y = element_text(face = "bold"),
+        plot.title = element_text(face = "bold", size = 13))
+
+# Imprimir gráfico
+print(grafica_nucleotidos6)
+```
+
+```{r}
+#---------ON291271--------------------------------
+colores <- c("skyblue", "steelblue", "navy", "darkgreen")
+
+# Crear gráfico de barras
+grafica_nucleotidos7 <- ggplot(nucleotidos, aes(x = rownames(nucleotidos), y = ON291271, fill = rownames(nucleotidos))) +
+  geom_bar(stat = "identity") +
+  labs(x = "Base nitrogenada", y = "Cantidad", title = "Composición de nucleótidos del genoma ON291271") +
+  scale_x_discrete(labels = c("A", "C", "G", "T")) +
+  scale_fill_manual(values = colores) +
+  theme(axis.text.x = element_text(face = "bold"),
+        axis.text.y = element_text(face = "bold"),
+        axis.title.x = element_text(face = "bold"),
+        axis.title.y = element_text(face = "bold"),
+        plot.title = element_text(face = "bold", size = 13))
+
+# Imprimir gráfico
+print(grafica_nucleotidos7)
+```
+
+```{r}
+#----------MT994849----------------------------
+
+colores <- c("skyblue", "steelblue", "navy", "darkgreen")
+
+# Crear gráfico de barras
+grafica_nucleotidos8 <- ggplot(nucleotidos, aes(x = rownames(nucleotidos), y = MT994849, fill = rownames(nucleotidos))) +
+  geom_bar(stat = "identity") +
+  labs(x = "Base nitrogenada", y = "Cantidad", title = "Composición de nucleótidos del genoma MT994849") +
+  scale_x_discrete(labels = c("A", "C", "G", "T")) +
+  scale_fill_manual(values = colores) +
+  theme(axis.text.x = element_text(face = "bold"),
+        axis.text.y = element_text(face = "bold"),
+        axis.title.x = element_text(face = "bold"),
+        axis.title.y = element_text(face = "bold"),
+        plot.title = element_text(face = "bold", size = 13))
+
+# Imprimir gráfico
+print(grafica_nucleotidos8)
+```
+
+```{r}
+#----------OK096766--------------------------
+
+colores <- c("skyblue", "steelblue", "navy", "darkgreen")
+
+# Crear gráfico de barras
+grafica_nucleotidos9 <- ggplot(nucleotidos, aes(x = rownames(nucleotidos), y = OK096766, fill = rownames(nucleotidos))) +
+  geom_bar(stat = "identity") +
+  labs(x = "Base nitrogenada", y = "Cantidad", title = "Composición de nucleótidos del genoma OK096766") +
+  scale_x_discrete(labels = c("A", "C", "G", "T")) +
+  scale_fill_manual(values = colores) +
+  theme(axis.text.x = element_text(face = "bold"),
+        axis.text.y = element_text(face = "bold"),
+        axis.title.x = element_text(face = "bold"),
+        axis.title.y = element_text(face = "bold"),
+        plot.title = element_text(face = "bold", size = 13))
+
+
+# Imprimir gráfico
+print(grafica_nucleotidos9)
+```
+
+```{r}
+#---------MW466791-----------------------------
+
+colores <- c("skyblue", "steelblue", "navy", "darkgreen")
+
+# Crear gráfico de barras
+grafica_nucleotidos10 <- ggplot(nucleotidos, aes(x = rownames(nucleotidos), y = MW466791, fill = rownames(nucleotidos))) +
+  geom_bar(stat = "identity") +
+  labs(x = "Base nitrogenada", y = "Cantidad", title = "Composición de nucleótidos del genoma MW466791") +
+  scale_x_discrete(labels = c("A", "C", "G", "T")) +
+  scale_fill_manual(values = colores) +
+  theme(axis.text.x = element_text(face = "bold"),
+        axis.text.y = element_text(face = "bold"),
+        axis.title.x = element_text(face = "bold"),
+        axis.title.y = element_text(face = "bold"),
+        plot.title = element_text(face = "bold", size = 13))
+
+
+# Imprimir gráfico
+print(grafica_nucleotidos10)
+
+```
+
+**Las gráficas muestran la composición de nucleótidos en 10 genomas secuenciados (todos provenientes del virus SARS-coV-2). En general se observa que las cantidades de las bases nitrogenadas cambian ligeramente.  Aunque hay pequeñas variaciones en la cantidad de cada tipo de nucleótido, la composición general sigue siendo similar en todos los genomas.** 
+
+**En resumen, estos resultados sugieren que la estructura genética del Sars-Cov-2 no ha sufrido cambios significativos en su composición de nucleótidos recientemente. La alta proporción de Timina  y Adenina tiene relación con el cómo se adapta el virus al entrar a las células de las personas infectadas, y también se relaciona con la capacidad del virus a su capacidad para evadir la respuesta inmunológica de quien es infectado. Sin embargo, es importante tener en cuenta que la información proporcionada se refiere solo a la composición de nucleótidos y no a la función de los genes individuales, que pueden haber experimentado cambios o mutaciones en el tiempo.**
+
+
+```{r}
+#EJERCICIO 8
+#Calcula el %GC de cada variante
+
+NC_045512_GC <- GC(virus_sequences_character[[1]])*100
+OP435368_GC <- GC(virus_sequences_character[[2]])*100
+OQ918256_GC <- GC(virus_sequences_character[[3]])*100
+BS007312_GC <- GC(virus_sequences_character[[4]])*100
+OQ913932_GC <- GC(virus_sequences_character[[5]])*100
+OP848485_GC <- GC(virus_sequences_character[[6]])*100
+ON291271_GC <- GC(virus_sequences_character[[7]])*100
+MT994849_GC <- GC(virus_sequences_character[[8]])*100
+OK096766_GC <- GC(virus_sequences_character[[9]])*100
+MW466791_GC <- GC(virus_sequences_character[[10]])*100
+
+gc_porcentaje <- c(NC_045512_GC, OP435368_GC, OQ918256_GC, BS007312_GC, OQ913932_GC, OP848485_GC, ON291271_GC, MT994849_GC, OK096766_GC, MW466791_GC)
+genomas <- c("NC_045512", "OP435368", "OQ918256", "BS007312", "OQ913932", "OP848485", "ON291271", "MT994849", "OK096766", "MW466791")
+gc_final <- data.frame(Genoma = genomas, GC_Porcentaje = gc_porcentaje)
+
+gc_final 
+```
+
+```{r fig.height=5, fig.width=9}
+#EJERCICIO 9    
+
+ggplot(gc_final, aes(x = Genoma, y = GC_Porcentaje, fill = Genoma)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Genoma", y = "Porcentaje de GC", title = "Porcentaje de GC de cada genoma de SARS-CoV-2") +
+  theme(axis.text.x = element_text(size = 8),
+        axis.text.y = element_text(size = 9),
+        axis.title.x = element_text(face = "bold"),
+        axis.title.y = element_text(face = "bold"),
+        plot.title = element_text(face = "bold", size = 14))
+```
+
+**La gráfica muestra una composición de nucleótidos GC (guanina y citosina) en el virus SARS-COV-2. Al observar la gráfica nos damos cuenta que los valores de Citosina y Guanina casi no cambian. Por ejemplo el valor del porcentaje de GC del primer adn del covid-19 encontrado es de 37.97278%, y el más lejano es de 38.00020%, el cual su país proveniente es Irán. En base a esta información se puede inferir que la zona geográfica puede llegar a tener un impacto, sin embargo el cambio sería menos del 1%.**
+
+**En caso de que el virus tuviera alteraciones en los porcentajes de GC, esto indicaría una evolución más drástica y podría generar nuevas capacidades de transmisión y alojamiento, lo que dificultará el desarrollo de tratamientos efectivos. Por lo tanto, la estabilidad en la composición de nucleótidos GC es una ventaja para la humanidad, en cuanto al control y tratamiento del SARS-COV-2.**
+
+```{r}
+#EJERCICIO 11
+
+virus_nombre <- rep("SARS-coV-2",10)
+pais <- c("China","Finlandia","India","Japón","Estdos Unidos","Australia","Francia","Iran","Alemania","Corea del Sur")
+gc_genomas <- sapply(virus_sequences_character, function(x) GC(x) * 100)
+
+dataFrameFinal <- data.frame(Virus = virus_nombre, ID = corona_virus,País_de_Origen = pais, Longitud = longitud, Porcentaje_GC = gc_genomas)
+
+print(dataFrameFinal, row.names = FALSE)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Evidencia 2 | Análisis Final
+
+```{r}
+library(Biostrings)
+library(ade4)
+library(seqinr)
+library(adegenet)
+library(ape)
+library(DECIPHER)
+library(phytools)
+library(maps)
+library(viridis)
+library(viridisLite)
+library(ggtree)
+library(ggplot2)
+
+```
+
+```{r}
+setwd("C:/Users/alang/Documents/Tec/Tareas/Analisis de Biologia Computacional")
+
+```
+
+```{r}
+
+corona_virus <- c("NC_045512", "OP435368", "OQ918256", "BS007312", "OQ913932", "OP848485", "ON291271", "MT994849",
+                  "OK096766", "MW466791")  
+
+virus_sequences <- read.GenBank(corona_virus)
+virus_sequences
+
+```
+
+```{r}
+
+write.dna(virus_sequences, file = "coronavirus_seqs.fasta", format = "fasta")
+
+```
+
+```{r}
+
+virus_seq_not_align <- readDNAStringSet("coronavirus_seqs.fasta", format = "fasta")
+class(virus_seq_not_align)
+virus_seq_not_align
+
+```
+
+```{r}
+virus_seq_not_align_150 <- virus_seq_not_align[,1:150]
+virus_seq_not_align_150 <- OrientNucleotides(virus_seq_not_align_150)
+virus_seq_align_150 <- AlignSeqs(virus_seq_not_align_150)
+
+```
+
+```{r}
+virus_seq_not_align_500_650 <- virus_seq_not_align[,500:650]
+virus_seq_not_align_500_650 <- OrientNucleotides(virus_seq_not_align_500_650)
+virus_seq_align_500_650 <- AlignSeqs(virus_seq_not_align_500_650)
+
+```
+
+```{r}
+BrowseSeqs(virus_seq_align_150)
+BrowseSeqs(virus_seq_align_500_650)
+
+```
+
+
+Alineamiento de las primeras 150 posiciones:
+
+![ ](PRIMEROS.png)
+Alineamiento de los nucleótidos 500 - 650: 
+![](SEGUNDOS.png)
+
+```{r}
+writeXStringSet(virus_seq_align_150, file = "coronavirus_seq_align_150.fasta")
+writeXStringSet(virus_seq_align_500_650, file = "coronavirus_seq_align_500_650.fasta")
+
+virus_aligned_150 <- read.alignment("coronavirus_seq_align_150.fasta", format = "fasta")
+virus_aligned_500_650 <- read.alignment("coronavirus_seq_align_500_650.fasta", format = "fasta")
+
+```
+
+```{r}
+matriz_distancia_150 <- dist.alignment(virus_aligned_150, matrix = "similarity")
+as.data.frame(as.matrix(matriz_distancia_150))
+tablas_grises_150 <- as.data.frame(as.matrix(matriz_distancia_150))
+table.paint(tablas_grises_150, cleg = 0, clabel.row = .5, clabel.col = .5)
+
+```
+
+
+```{r fig.height=8, fig.width=10}
+
+
+library(phytools)
+library(maps)
+
+virus_tree <- nj(matriz_distancia_150)
+
+virus_colors <- c("red", "blue", "#2E8B57", "purple","orange", "#008B8B",
+                  "#8B795E", "#CD6090", "brown", "black")
+
+virus_tree <- ladderize(virus_tree)
+
+#Titulo
+plot(virus_tree, main = "Arbol Filogenetico del virus SARS-COV2", tip.color=virus_colors)
+
+# Asignar nombres y ubicaciones a cada virus
+virus_id <- c("NC_045512", "OP435368", "OQ918256", "BS007312", "OQ913932", "OP848485", "ON291271", "MT994849", "OK096766", "MW466791")
+virus_date <- c("China", "Finlandia", "India", "Japón", "USA", "Australia", "Francia", "Irán", "Alemania", "Corea del Sur")
+
+tip_dates <- data.frame(tips=virus_tree$tip.label, date = virus_date)
+
+legend("bottomright", legend = paste(tip_dates$tips, " - (", tip_dates$date, ")", sep = ""),
+       pch = 18, col = c("red", "blue", "#2E8B57", "purple", "orange", "#008B8B", "#8B795E", "#CD6090", "brown",  "black" ), pt.bg = "white", title = "Codigo de Accesion - Ubicacion")
+
+
+
+```
+
+**Este árbol filogenético es una representación gráfica que nos muestra las relaciones evolutivas entre 10 virus tipo SARS-COV2. Fue construido mediante el análisis de similitudes y diferencias en características como lo es la ubicación en el que se manifestó el virus. Las ramas representan la divergencia de diferentes cepas de virus a lo largo del tiempo y los nodos representan el punto donde ocurrieron divergencias en la evolución de los virus, por ejemplo el virus con código de accesión OK96766, detectado en Alemania, y el genoma originario de Francia ON291271 comparten un ancestro en común, ya que sus ramas originaron en un mismo nodo. Con la información anterior, se puede concluir que en ciertos casos los lugares cercanos tendrán ancestros en común, debido a las variables que se toman en cuenta, como lo puede ser el clima y el estilo de vida de las personas. Estos árboles son muy útiles para conocer la evolución de características específicas en diferentes linajes de organismos.**
+
+
+
